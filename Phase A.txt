@@ -1,0 +1,53 @@
+# Define thresholds
+volume_threshold = 1.5  # 150% of the average volume (place holder values for the whole file)
+price_reversal_threshold = 0.03  # 3% price reversal
+sharp_price_decline_threshold = 0.05  # 5% price decline
+
+# Initialize variables
+average_volume = CALCULATE_AVERAGE_VOLUME(past_N_periods)
+low_of_downtrend = FIND_LOWEST_PRICE(past_N_periods)
+
+# Phase A detection
+IF current_volume > (average_volume * volume_threshold) THEN
+    PS_detected = TRUE
+    PS_price = current_price
+    PS_volume = current_volume
+    # Note for PS not completed needs momentum slowdown detection logic (on it)
+
+    # wait for SC after PS 
+    IF PS_detected THEN  # Assuming PS has already been detected
+    IF current_volume > (average_volume * volume_climax_threshold) THEN
+        recent_low = FIND_LOWEST_PRICE(since_PS)
+        IF (recent_low - current_price) / recent_low >= sharp_price_decline_threshold THEN
+            # Sharp decline in price
+            SC_detected = TRUE
+            SC_price = current_price
+            SC_volume = current_volume
+
+            # Check for a reversal following the SC
+            IF (FIND_MAX_PRICE(since_SC) - SC_price) / SC_price >= price_reversal_threshold THEN
+                SC_reversal_detected = TRUE
+            END IF
+        END IF
+    END IF
+END IF
+
+    # Automatic Rally (AR) after Selling Climax
+    IF SC_detected THEN
+        AR_price = FIND_MAX_PRICE(since_SC_period)
+        IF (AR_price - SC_price) / SC_price >= price_reversal_threshold THEN
+            AR_detected = TRUE
+            resistance_level = AR_price
+        END IF
+    END IF
+END IF
+
+# Confirm end of Phase A
+IF AR_detected AND current_price < resistance_level THEN
+    # Look for Secondary Test (ST)
+    ST_price = current_price
+    IF ST_price > SC_price THEN
+        end_of_phase_A = TRUE
+        # Proceed to Phase B 
+    END IF
+END IF

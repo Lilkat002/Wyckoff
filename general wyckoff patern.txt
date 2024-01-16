@@ -1,0 +1,27 @@
+IF downtrend THEN
+    WAIT FOR increase in volume (potential PS)
+    IF volume significantly high AND price reversal THEN
+        SET SC point
+        WAIT FOR price increase (AR)
+        SET first resistance at top of AR
+        WAIT FOR price retracement (ST)
+        IF price does not make new lows THEN
+            END Phase A
+            BEGIN Phase B
+            IF price makes a new high higher than AR THEN
+                SET new resistance line
+                OBSERVE trading range between new high and SC
+                IF price breaks below SC and then rises above ST THEN
+                    BEGIN Phase C
+                    IF price breaks above AR with high volume THEN
+                        BEGIN Phase D
+                        IF price continues to rally THEN
+                            BEGIN Phase E
+                            PATTERN complete
+                        END IF
+                    END IF
+                END IF
+            END IF
+        END IF
+    END IF
+END IF

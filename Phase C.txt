@@ -1,0 +1,59 @@
+# Define the thresholds and variables
+support_level = SC_price  # Established in Phase A
+spring_threshold = 0.97  # 3% below the support level for Spring
+lps_threshold = 0.03  # 3% for determining higher lows for LPS
+average_volume = CALCULATE_AVERAGE_VOLUME(past_n_periods)
+volume_spike_threshold = 1.5  # 150% of the average volume
+
+# Phase C: Detection of Spring and LPS
+WHILE NOT phase_C_end DO
+    current_price = GET_CURRENT_PRICE()
+    current_volume = GET_CURRENT_VOLUME()
+
+    # Check for Spring
+    IF current_price < (support_level * spring_threshold) THEN
+        # Price dips below the support level, indicating a Spring
+        IF current_volume > (average_volume * volume_spike_threshold) AND
+           RECOVERS_ABOVE(support_level) THEN
+            spring_detected = TRUE
+            spring_price = current_price
+            spring_volume = current_volume
+        END IF
+    END IF
+
+    # Check for LPS
+    IF spring_detected THEN
+        # After a Spring, look for an LPS
+        IF current_price > (spring_price * (1 + lps_threshold)) AND
+           current_price < support_level AND
+           STABLE_VOLUME() THEN
+            lps_detected = TRUE
+            lps_price = current_price
+            lps_volume = current_volume
+        END IF
+    ELSE
+        # If no Spring, look for a higher low near support level
+        IF current_price > support_level AND
+           current_price < (support_level * (1 + lps_threshold)) AND
+           STABLE_VOLUME() THEN
+            lps_detected = TRUE
+            lps_price = current_price
+            lps_volume = current_volume
+        END IF
+    END IF
+
+    # Test after Spring or during LPS formation
+    IF spring_detected OR lps_detected THEN
+        IF TEST_NEAR(support_level) AND 
+           current_volume < (average_volume * volume_spike_threshold) THEN
+            test_of_spring_or_lps = TRUE
+            test_price = current_price
+        END IF
+    END IF
+
+    # Confirm end of Phase C
+    IF test_of_spring_or_lps THEN
+        phase_C_end = TRUE
+        # Proceed to Phase D 
+    END IF
+END WHILE

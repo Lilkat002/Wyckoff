@@ -1,0 +1,52 @@
+# Define thresholds and variables
+resistance_level = AR_price  # Established in Phase A
+sos_threshold = 1.03  # 3% above the resistance level for SOS
+lps_correction_threshold = 0.97  # 3% correction for LPS
+average_volume = CALCULATE_AVERAGE_VOLUME(past_n_periods)
+volume_spike_threshold = 1.5  # 150% of the average volume
+
+# Phase D: Detection of rally, LPS, and SOS
+WHILE NOT phase_D_end DO
+    current_price = GET_CURRENT_PRICE()
+    current_volume = GET_CURRENT_VOLUME()
+
+    # Check for a rally up from the test
+    IF current_price > lps_price AND
+       current_volume > (average_volume * volume_spike_threshold) THEN
+        rally_detected = TRUE
+        rally_price = current_price
+    END IF
+
+    # Check for a small correction (LPS after rally)
+    IF rally_detected THEN
+        IF current_price < (rally_price * lps_correction_threshold) THEN
+            lps_after_rally_detected = TRUE
+            lps_after_rally_price = current_price
+        END IF
+    END IF
+
+    # Check for Signs of Strength (SOS)
+    IF current_price > (resistance_level * sos_threshold) AND
+       current_volume > (average_volume * volume_spike_threshold) THEN
+        sos_detected = TRUE
+        sos_price = current_price
+        sos_volume = current_volume
+    END IF
+
+    # Check for Back Up (BU) or LPS in the AR level after SOS
+    IF sos_detected THEN
+        IF current_price < sos_price AND
+           current_price >= resistance_level AND
+           STABLE_VOLUME() THEN
+            bu_lps_detected = TRUE
+            bu_lps_price = current_price
+        END IF
+    END IF
+
+    # Confirm end of Phase D
+    IF bu_lps_detected OR
+       (sos_detected AND NOT lps_after_rally_detected) THEN
+        phase_D_end = TRUE
+        # Phase D is complete, indicating a potential start of Phase E
+    END IF
+END WHILE

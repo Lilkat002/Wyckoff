@@ -1,0 +1,57 @@
+# Initialize thresholds and variables
+support_level = SC_price  # Established in Phase A
+resistance_level = AR_price  # Established in Phase A
+new_high_threshold = 1.01  # 1% above the AR
+new_low_threshold = 0.99  # 1% below the SC
+average_volume = CALCULATE_AVERAGE_VOLUME(past_n_periods)
+
+# Phase B: Look for tests of support and resistance
+WHILE NOT phase_B_end DO
+    current_price = GET_CURRENT_PRICE()
+    current_volume = GET_CURRENT_VOLUME()
+
+    # Check for tests of resistance
+    IF current_price > resistance_level THEN
+        IF current_price <= (resistance_level * new_high_threshold) THEN
+            # Price is testing or slightly above AR but not breaking out
+            resistance_test = TRUE
+            high_within_threshold = TRUE
+        ELSE
+            # Price made a new high above AR threshold
+            new_high_formed = TRUE
+        END IF
+    END IF
+
+    # Check for tests of support
+    IF current_price < support_level THEN
+        IF current_price >= (support_level * new_low_threshold) THEN
+            # Price is testing or slightly below SC but not breaking down
+            support_test = TRUE
+            low_within_threshold = TRUE
+        ELSE
+            # Price made a new low below SC threshold
+            new_low_formed = TRUE
+        END IF
+    END IF
+
+    # Confirm trading within established range
+    IF (high_within_threshold OR resistance_test) AND 
+       (low_within_threshold OR support_test) THEN
+        trading_within_range = TRUE
+    END IF
+
+    # Adjust support and resistance levels if new highs or lows are confirmed
+    IF new_high_formed THEN
+        resistance_level = current_price
+    END IF
+
+    IF new_low_formed THEN
+        support_level = current_price
+    END IF
+
+    # End Phase B if breakout or breakdown is confirmed with significant volume
+    IF (new_high_formed AND current_volume > (average_volume * volume_threshold)) OR
+       (new_low_formed AND current_volume > (average_volume * volume_threshold)) THEN
+        phase_B_end = TRUE
+    END IF
+END WHILE

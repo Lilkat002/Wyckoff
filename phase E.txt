@@ -1,0 +1,26 @@
+# Define variables
+sos_level = sos_price  # Established in Phase D as a Sign of Strength
+average_volume = CALCULATE_AVERAGE_VOLUME(past_n_periods)
+volume_increase_threshold = 1.2  # 120% of the average volume
+
+# Phase E: Detection of the uptrend
+WHILE TRUE DO
+    current_price = GET_CURRENT_PRICE()
+    current_volume = GET_CURRENT_VOLUME()
+
+    # Confirm the uptrend
+    IF current_price > sos_level AND
+       current_volume > (average_volume * volume_increase_threshold) THEN
+        uptrend_confirmed = TRUE
+        uptrend_price = current_price
+        uptrend_volume = current_volume
+    END IF
+
+    # Look for sustained breakouts
+    IF uptrend_confirmed AND
+       current_price > uptrend_price THEN  # Ensuring the price is making new highs
+        breakout_confirmed = TRUE
+        breakout_price = current_price
+        # The market is likely to continue the uptrend
+    END IF
+END WHILE
